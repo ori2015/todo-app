@@ -1,7 +1,17 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using TodoApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// קבלת מחרוזת חיבור מה-ENV
+var dbConnectionString = Environment.GetEnvironmentVariable("DB_CSTR")
+    ?? "Server=mariadb;Database=sampledb;User=admin;Password=Aa1234561!;";
+
+// הגדרת DbContext עם MySQL/MariaDB
+builder.Services.AddDbContext<TodoDb>(options =>
+    options.UseMySql(dbConnectionString, ServerVersion.AutoDetect(dbConnectionString)));
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -18,6 +28,13 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// יצירת הטבלאות אוטומטית (Migration)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<TodoDb>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

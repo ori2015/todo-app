@@ -1,6 +1,6 @@
 # todo-app
 
-This project is a simple Todo application built with a .NET Core backend and a Svelte frontend. 
+This project is a simple Todo application built with a .NET Core backend connected to MariaDB and a Svelte frontend. 
 
 ## Project Structure
 
@@ -8,6 +8,8 @@ This project is a simple Todo application built with a .NET Core backend and a S
 todo-app
 ├── api                # .NET Core backend
 │   ├── Controllers    # API controllers
+│   ├── Data           # Database context
+│   ├── Migrations     # Entity Framework migrations
 │   ├── Models         # Data models
 │   ├── Services       # Service interfaces
 │   ├── Program.cs     # Application entry point
@@ -23,6 +25,19 @@ todo-app
 ├── .gitignore         # Git ignore file
 └── README.md          # Project documentation
 ```
+
+## Database Configuration
+
+The application now uses MariaDB as the database. The connection string is read from the environment variable `DB_CSTR`. 
+
+Default connection string: `Server=mariadb;Database=sampledb;User=admin;Password=Aa1234561!;`
+
+## API Endpoints
+
+- `GET /api/todo` - Get all todos
+- `POST /api/todo` - Create a new todo
+- `PUT /api/todo/{id}` - Update an existing todo
+- `DELETE /api/todo/{id}` - Delete a todo
 
 ## Getting Started
 

@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TodoApp.Models;
+using TodoApp.Data;
 
 namespace TodoApp.Controllers
 {
@@ -7,30 +9,74 @@ namespace TodoApp.Controllers
     [Route("api/[controller]")]
     public class TodoController : ControllerBase
     {
-        private static List<TodoItem> _todos = new List<TodoItem>
+        private readonly TodoDb _context;
+
+        public TodoController(TodoDb context)
         {
-            new TodoItem { Id = 1, Task = "Learn .NET", IsDone = false },
-            new TodoItem { Id = 2, Task = "Build Todo App", IsDone = false }
-        };
+            _context = context;
+        }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return Ok(_todos);
+            var todos = await _context.Todos.ToListAsync();
+            return Ok(todos);
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] TodoItem item)
+        public async Task<IActionResult> Post([FromBody] TodoItem item)
         {
             if (item == null || string.IsNullOrWhiteSpace(item.Task))
             {
                 return BadRequest("Task cannot be empty");
             }
 
-            item.Id = _todos.Count > 0 ? _todos.Max(t => t.Id) + 1 : 1;
-            _todos.Add(item);
+            _context.Todos.Add(item);
+            await _context.SaveChangesAsync();
             
             return CreatedAtAction(nameof(Get), new { id = item.Id }, item);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] TodoItem item)
+        {
+            if (id != item.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(item).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                var exists = await _context.Todos.AnyAsync(e => e.Id == id);
+                if (!exists)
+                {
+                    return NotFound();
+                }
+                throw;
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var todo = await _context.Todos.FindAsync(id);
+            if (todo == null)
+            {
+                return NotFound();
+            }
+
+            _context.Todos.Remove(todo);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
