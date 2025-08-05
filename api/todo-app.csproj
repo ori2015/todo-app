@@ -1,4 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<P  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>todo_app</RootNamespace>
+    <AssemblyName>todo-app</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.0" />
+  </ItemGroup>Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
